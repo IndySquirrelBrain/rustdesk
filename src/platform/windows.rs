@@ -1498,7 +1498,9 @@ fn get_after_install(
     reg_value_printer: Option<String>,
 ) -> String {
     let app_name = crate::get_app_name();
-    let ext = app_name.to_lowercase();
+    // Strip spaces: `ext` becomes the URL-protocol scheme and file-association
+    // extension, neither of which may contain spaces (e.g. "sbtconnect").
+    let ext = app_name.to_lowercase().replace(' ', "");
 
     // reg delete HKEY_CURRENT_USER\Software\Classes for
     // https://github.com/rustdesk/rustdesk/commit/f4bdfb6936ae4804fc8ab1cf560db192622ad01a

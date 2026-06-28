@@ -1012,7 +1012,9 @@ pub fn is_rustdesk() -> bool {
 
 #[inline]
 pub fn get_uri_prefix() -> String {
-    format!("{}://", get_app_name().to_lowercase())
+    // APP_NAME (e.g. "SBT Connect") may contain spaces, but a URL scheme must not.
+    // Strip spaces so the scheme is valid, e.g. "sbtconnect://".
+    format!("{}://", get_app_name().to_lowercase().replace(' ', ""))
 }
 
 #[cfg(target_os = "macos")]
