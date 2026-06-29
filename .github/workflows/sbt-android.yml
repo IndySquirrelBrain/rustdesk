@@ -336,7 +336,13 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           SIGNED="${{steps.sign-rustdesk.outputs.signedReleaseFile}}"
-          DEST="${SIGNED%-signed.apk}.apk"
+          arch="$(basename "${SIGNED%-signed.apk}")"; arch="${arch#rustdesk-${{ env.VERSION }}-}"
+          case "$arch" in
+            universal) DEST="SBT-Connect-${{ env.VERSION }}-android.apk";;
+            aarch64)   DEST="SBT-Connect-${{ env.VERSION }}-android-arm64.apk";;
+            x86_64)    DEST="SBT-Connect-${{ env.VERSION }}-android-x64.apk";;
+            *)         DEST="SBT-Connect-${{ env.VERSION }}-android-${arch}.apk";;
+          esac
           cp "$SIGNED" "$DEST"
           gh release create "${{ env.TAG_NAME }}" --prerelease --title "${{ env.TAG_NAME }}" --notes "SBT Connect ${{ env.TAG_NAME }}" 2>/dev/null || true
           gh release upload "${{ env.TAG_NAME }}" "$DEST" --clobber
@@ -523,7 +529,13 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           SIGNED="${{steps.sign-rustdesk.outputs.signedReleaseFile}}"
-          DEST="${SIGNED%-signed.apk}.apk"
+          arch="$(basename "${SIGNED%-signed.apk}")"; arch="${arch#rustdesk-${{ env.VERSION }}-}"
+          case "$arch" in
+            universal) DEST="SBT-Connect-${{ env.VERSION }}-android.apk";;
+            aarch64)   DEST="SBT-Connect-${{ env.VERSION }}-android-arm64.apk";;
+            x86_64)    DEST="SBT-Connect-${{ env.VERSION }}-android-x64.apk";;
+            *)         DEST="SBT-Connect-${{ env.VERSION }}-android-${arch}.apk";;
+          esac
           cp "$SIGNED" "$DEST"
           gh release create "${{ env.TAG_NAME }}" --prerelease --title "${{ env.TAG_NAME }}" --notes "SBT Connect ${{ env.TAG_NAME }}" 2>/dev/null || true
           gh release upload "${{ env.TAG_NAME }}" "$DEST" --clobber

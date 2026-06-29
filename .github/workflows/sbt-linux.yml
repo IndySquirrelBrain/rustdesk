@@ -353,8 +353,13 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          label=$([ "${{ matrix.job.arch }}" = "aarch64" ] && echo arm64 || echo x64)
+          v="${{ env.VERSION }}"; out=""
+          for f in rustdesk-*.deb; do [ -e "$f" ] && cp "$f" "SBT-Connect-${v}-linux-${label}.deb" && out="$out SBT-Connect-${v}-linux-${label}.deb"; done
+          for f in rustdesk-*-suse.rpm; do [ -e "$f" ] && cp "$f" "SBT-Connect-${v}-linux-${label}-suse.rpm" && out="$out SBT-Connect-${v}-linux-${label}-suse.rpm"; done
+          for f in rustdesk-*.rpm; do case "$f" in *-suse.rpm) ;; *) [ -e "$f" ] && cp "$f" "SBT-Connect-${v}-linux-${label}.rpm" && out="$out SBT-Connect-${v}-linux-${label}.rpm";; esac; done
           gh release create "${{ env.TAG_NAME }}" --prerelease --title "${{ env.TAG_NAME }}" --notes "SBT Connect ${{ env.TAG_NAME }} (unsigned build)" 2>/dev/null || true
-          gh release upload "${{ env.TAG_NAME }}" rustdesk-*.deb rustdesk-*.rpm --clobber
+          gh release upload "${{ env.TAG_NAME }}" $out --clobber
 
       - name: Upload deb
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -388,5 +393,6 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload "${{ env.TAG_NAME }}" res/rustdesk-${{ env.VERSION }}*.zst --clobber
+          cp res/rustdesk-${{ env.VERSION }}*.zst "SBT-Connect-${{ env.VERSION }}-linux-x64.pkg.tar.zst"
+          gh release upload "${{ env.TAG_NAME }}" "SBT-Connect-${{ env.VERSION }}-linux-x64.pkg.tar.zst" --clobber
 

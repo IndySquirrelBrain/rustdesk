@@ -270,5 +270,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          maclabel=$([ "${{ matrix.job.arch }}" = "aarch64" ] && echo apple-silicon || echo intel)
+          cp rustdesk*-${{ matrix.job.arch }}.dmg "SBT-Connect-${{ env.VERSION }}-macos-${maclabel}.dmg"
           gh release create "${{ env.TAG_NAME }}" --prerelease --title "${{ env.TAG_NAME }}" --notes "SBT Connect ${{ env.TAG_NAME }} (unsigned build)" 2>/dev/null || true
-          gh release upload "${{ env.TAG_NAME }}" rustdesk*-${{ matrix.job.arch }}.dmg --clobber
+          gh release upload "${{ env.TAG_NAME }}" "SBT-Connect-${{ env.VERSION }}-macos-${maclabel}.dmg" --clobber

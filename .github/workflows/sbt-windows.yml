@@ -375,6 +375,9 @@ jobs:
           # so fall through to `upload --clobber`, which OVERWRITES stale same-named
           # assets. softprops/action-gh-release@v1 silently skipped existing assets,
           # leaving older builds' binaries attached to the release.
+          label=$([ "${{ matrix.job.arch }}" = "aarch64" ] && echo arm64 || echo x64)
+          cp ./SignOutput/rustdesk-*.msi "SBT-Connect-${{ env.VERSION }}-windows-${label}.msi"
+          cp ./SignOutput/rustdesk-*.exe "SBT-Connect-${{ env.VERSION }}-windows-${label}-portable.exe"
           gh release create "${{ env.TAG_NAME }}" --prerelease --title "${{ env.TAG_NAME }}" --notes "SBT Connect ${{ env.TAG_NAME }} (unsigned build)" 2>/dev/null || true
-          gh release upload "${{ env.TAG_NAME }}" ./SignOutput/rustdesk-*.msi ./SignOutput/rustdesk-*.exe --clobber
+          gh release upload "${{ env.TAG_NAME }}" "SBT-Connect-${{ env.VERSION }}-windows-${label}.msi" "SBT-Connect-${{ env.VERSION }}-windows-${label}-portable.exe" --clobber
 
