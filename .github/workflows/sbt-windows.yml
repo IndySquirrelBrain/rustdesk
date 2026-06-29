@@ -366,12 +366,15 @@ jobs:
           BASE_URL=${{ env.SIGN_BASE_URL }} SECRET_KEY=${{ secrets.SIGN_SECRET_KEY }} python3 res/job.py sign_files ./SignOutput
 
       - name: Publish Release
-        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
         if: env.UPLOAD_ARTIFACT == 'true'
-        with:
-          prerelease: true
-          tag_name: ${{ env.TAG_NAME }}
-          files: |
-            ./SignOutput/rustdesk-*.msi
-            ./SignOutput/rustdesk-*.exe
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Create the prerelease on the first run; on re-dispatch it already exists,
+          # so fall through to `upload --clobber`, which OVERWRITES stale same-named
+          # assets. softprops/action-gh-release@v1 silently skipped existing assets,
+          # leaving older builds' binaries attached to the release.
+          gh release create "${{ env.TAG_NAME }}" --prerelease --title "${{ env.TAG_NAME }}" --notes "SBT Connect ${{ env.TAG_NAME }} (unsigned build)" 2>/dev/null || true
+          gh release upload "${{ env.TAG_NAME }}" ./SignOutput/rustdesk-*.msi ./SignOutput/rustdesk-*.exe --clobber
 
