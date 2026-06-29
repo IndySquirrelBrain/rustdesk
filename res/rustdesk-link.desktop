@@ -1,7 +1,7 @@
 [Desktop Entry]
-Name=RustDesk
+Name=SBT Connect
 NoDisplay=true
-MimeType=x-scheme-handler/rustdesk;
+MimeType=x-scheme-handler/sbtconnect;
 TryExec=rustdesk
 Exec=rustdesk %u
 Icon=rustdesk
